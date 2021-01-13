@@ -35,6 +35,21 @@ class CustomRegistrationsControllerTest < Devise::ControllerTestCase
     assert @controller.update_block_called?, "update failed to yield resource to provided block"
   end
 
+  test "update redirects to users_edit_path on failure by default" do
+    sign_in @user
+    put :update, params: { user: { } }
+    assert_nil response.location
+  end
+
+  test "update redirects to after_error_update_path_for on failure" do
+    sign_in @user
+    custom_path = "http://custom.path/"
+    Custom::RegistrationsController.any_instance.stubs(:after_error_update_path_for).with(@user).returns(custom_path)
+
+    put :update, params: { user: { } }
+    assert_equal custom_path, response.location
+  end
+
   test "yield resource to block on new" do
     get :new
     assert @controller.new_block_called?, "new failed to yield resource to provided block"

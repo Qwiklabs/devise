@@ -57,7 +57,7 @@ class Devise::RegistrationsController < DeviseController
     else
       clean_up_passwords resource
       set_minimum_password_length
-      respond_with resource
+      respond_with resource, location: after_error_update_path_for(resource)
     end
   end
 
@@ -125,6 +125,10 @@ class Devise::RegistrationsController < DeviseController
   # this method in your own RegistrationsController.
   def after_update_path_for(resource)
     sign_in_after_change_password? ? signed_in_root_path(resource) : new_session_path(resource_name)
+  end
+
+  def after_error_update_path_for(resource)
+    nil
   end
 
   # Authenticates the current scope and gets the current resource from the session.
